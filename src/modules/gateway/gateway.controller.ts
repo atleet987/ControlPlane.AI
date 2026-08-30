@@ -13,7 +13,7 @@ export class GatewayController {
   @ApiOperation({ summary: 'Policy-checked completion through the control plane' })
   complete(
     @Body() dto: CompletionRequestDto,
-    @Headers(TRACE_ID_HEADER) traceId: string,
+    @Headers(TRACE_ID_HEADER) traceId?: string,
   ): Promise<CompletionResponseDto> {
     return this.gatewayService.complete(dto, traceId);
   }

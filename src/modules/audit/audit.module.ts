@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuditController } from './audit.controller';
+import { AuditQueryService } from './audit-query.service';
 import { AuditService } from './audit.service';
 import { AuditEventEntity } from './entities/audit-event.entity';
 import { AUDIT_PUBLISHER } from './interfaces/audit-publisher.interface';
@@ -15,11 +17,13 @@ import { DatabaseAuditPublisher } from './publishers/database-audit.publisher';
  */
 @Module({
   imports: [TypeOrmModule.forFeature([AuditEventEntity])],
+  controllers: [AuditController],
   providers: [
     AuditService,
+    AuditQueryService,
     DatabaseAuditPublisher,
     { provide: AUDIT_PUBLISHER, useExisting: DatabaseAuditPublisher },
   ],
-  exports: [AuditService],
+  exports: [AuditService, AuditQueryService],
 })
 export class AuditModule {}

@@ -4,6 +4,7 @@ import { DetectionController } from './detection.controller';
 import { DetectionService } from './detection.service';
 import { FastPathService } from './fast-path/fast-path.service';
 import { PiiDetector } from './fast-path/pii.detector';
+import { PromptInjectionDetector } from './fast-path/prompt-injection.detector';
 import { ToxicityDetector } from './fast-path/toxicity.detector';
 import { FAST_PATH_DETECTORS, SLOW_PATH_DETECTORS } from './interfaces';
 import { EntailmentDetector } from './slow-path/entailment.detector';
@@ -21,6 +22,7 @@ import { SlowPathService } from './slow-path/slow-path.service';
     SlowPathService,
     PiiDetector,
     ToxicityDetector,
+    PromptInjectionDetector,
     EntailmentDetector,
     JudgeDetector,
     GeminiJudgeProvider,
@@ -31,8 +33,12 @@ import { SlowPathService } from './slow-path/slow-path.service';
     { provide: JUDGE_PROVIDER, useExisting: GeminiJudgeProvider },
     {
       provide: FAST_PATH_DETECTORS,
-      useFactory: (pii: PiiDetector, toxicity: ToxicityDetector) => [pii, toxicity],
-      inject: [PiiDetector, ToxicityDetector],
+      useFactory: (
+        pii: PiiDetector,
+        toxicity: ToxicityDetector,
+        injection: PromptInjectionDetector,
+      ) => [pii, toxicity, injection],
+      inject: [PiiDetector, ToxicityDetector, PromptInjectionDetector],
     },
     {
       provide: SLOW_PATH_DETECTORS,

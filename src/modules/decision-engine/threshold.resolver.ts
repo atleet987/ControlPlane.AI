@@ -10,9 +10,31 @@ import { ResolvedPolicy } from '../policy-config/interfaces/policy.interface';
  */
 @Injectable()
 export class ThresholdResolver {
-  resolve(_signal: DetectionSignal, _policy: ResolvedPolicy): DecisionAction {
-    // TODO: blockAt -> BLOCK, escalateAt -> ESCALATE, editAt -> EDIT, else ALLOW.
-    throw new Error('ThresholdResolver.resolve not implemented');
+  /**
+   * Bands are checked most severe first, so overlapping or misordered
+   * configuration still fails safe rather than picking the lenient branch.
+   * A detector with no configured band, or one explicitly disabled, contributes
+   * nothing — absence of configuration is not evidence of safety, it just means
+   * this policy does not act on that signal.
+   */
+  resolve(signal: DetectionSignal, policy: ResolvedPolicy): DecisionAction {
+    const threshold = policy.thresholds[signal.type];
+
+    if (!threshold || threshold.enabled === false) {
+      return DecisionAction.ALLOW;
+    }
+
+    if (threshold.blockAt !== undefined && signal.score >= threshold.blockAt) {
+      return DecisionAction.BLOCK;
+    }
+    if (threshold.escalateAt !== undefined && signal.score >= threshold.escalateAt) {
+      return DecisionAction.ESCALATE;
+    }
+    if (threshold.editAt !== undefined && signal.score >= threshold.editAt) {
+      return DecisionAction.EDIT;
+    }
+
+    return DecisionAction.ALLOW;
   }
 
   /** Severity ordering used to merge per-signal actions into one verdict. */
@@ -27,5 +49,10 @@ export class ThresholdResolver {
       case DecisionAction.BLOCK:
         return 3;
     }
+  }
+
+  /** Returns whichever action is more severe. */
+  static moreSevere(a: DecisionAction, b: DecisionAction): DecisionAction {
+    return ThresholdResolver.severityOf(a) >= ThresholdResolver.severityOf(b) ? a : b;
   }
 }

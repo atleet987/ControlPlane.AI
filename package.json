@@ -19,7 +19,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "docker:up": "docker compose -f docker-compose.prod-parity.yml up -d",
     "docker:down": "docker compose -f docker-compose.prod-parity.yml down",
-    "docker:logs": "docker compose -f docker-compose.prod-parity.yml logs -f"
+    "docker:logs": "docker compose -f docker-compose.prod-parity.yml logs -f",
+    "demo:reset": "node -e \"require('fs').rmSync('./data',{recursive:true,force:true});console.log('audit trail + policies cleared; restart the app to reseed')\""
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",

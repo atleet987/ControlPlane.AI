@@ -2,6 +2,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsIn,
   IsNumber,
   IsObject,
@@ -52,6 +53,21 @@ export class CompletionRequestDto {
   @IsOptional()
   temperature?: number;
 
+  @ApiPropertyOptional({
+    description:
+      'The model completion to inspect. Supplied directly so each decision tier ' +
+      'can be exercised deterministically; a live provider call would replace it.',
+  })
+  @IsString()
+  @IsOptional()
+  simulatedResponse?: string;
+
+  @ApiPropertyOptional({
+    description: 'Run the LLM-as-judge slow-path detector. Costs seconds; off by default.',
+  })
+  @IsBoolean()
+  @IsOptional()
+  useJudge?: boolean;
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
